@@ -4,7 +4,9 @@ import { IdGenerator } from "../services/IdGenerator";
 import { TokenManager } from "../services/TokenManager";
 import { CommentDatabase } from "../database/CommentDatabase";
 import { CreateCommentInputDTO } from "../dtos/comment/createComment";
-import { Comment, CommentDB } from "../models/Comment";
+import { COMMENT_LIKE, Comment, CommentDB, LikeDislikeDBComment } from "../models/Comment";
+import { LikeOrDislikeCommentInputDTO, LikeOrDislikeCommentOutputDTO } from "../dtos/comment/likeOrDislikeComment";
+import { LikeDislikeDB } from "../models/Post";
 
 export class CommentBusiness {
   constructor(
@@ -66,6 +68,85 @@ export class CommentBusiness {
   
     await this.commentDatabase.deleteComment(id);
   };
+
+
+  public likeOrDislikeComment = async (
+    input: LikeOrDislikeCommentInputDTO
+  ): Promise<LikeOrDislikeCommentOutputDTO> => {
+    const { token, like, commentId } = input
+
+    const payload = this.tokenManager.getPayload(token)
+
+    if (!payload) {
+      throw new UnauthorizedError()
+    }
+
+    const CommentDBWithCreatorName =
+      await this.commentDatabase.findPostsWithCreatorNameById(commentId)
+
+    if (!CommentDBWithCreatorName) {
+      throw new NotFoundError("Não existe post com esse id")
+    }
+
+    const comment = new Comment(
+      CommentDBWithCreatorName.id,
+      CommentDBWithCreatorName.creator_id,
+      CommentDBWithCreatorName.post_id,
+      CommentDBWithCreatorName.content,
+      CommentDBWithCreatorName.likes,   
+      CommentDBWithCreatorName.dislikes,
+      CommentDBWithCreatorName.created_at,
+      CommentDBWithCreatorName.updated_at,     
+      CommentDBWithCreatorName.creator_name,      
+    ) 
+     {}
+
+
+
+    const likeSQlite = like ? 1 : 0
+
+    const likeDislikeDB: LikeDislikeDBComment = {
+      user: payload.id,
+      post_id: commentId,
+      like: likeSQlite
+    }
+
+    const likeDislikeExists =
+      await this.commentDatabase.findLikeDislike(likeDislikeDB)
+      
+    if (likeDislikeExists === COMMENT_LIKE.ALREADY_LIKED) {
+      if (like) {
+        await this.commentDatabase.removeLikeDislike(likeDislikeDB)
+        comment.removeLike()
+      } else {
+        await this.commentDatabase.updateLikeDislike(likeDislikeDB)
+        comment.removeLike()
+        comment.addDislike()
+      }
+
+    } else if (likeDislikeExists === COMMENT_LIKE.ALREADY_DISLIKED) {
+      if (like === false) {
+        await this.commentDatabase.removeLikeDislike(likeDislikeDB)
+        comment.removeDislike()
+      } else {
+        await this.commentDatabase.updateLikeDislike(likeDislikeDB)
+        comment.removeDislike()
+        comment.addLike()
+      }
+
+    } else {
+      await this.commentDatabase.insertLikeDislike(likeDislikeDB)
+      like ? comment.addLike() : comment.addDislike()
+    }
+
+    const updatedCommentDB = comment.toDBModel()
+    await this.commentDatabase.updateComment(updatedCommentDB)
+
+    const output: LikeOrDislikeCommentOutputDTO = undefined
+
+    return output
+  }
+
 
 }
 

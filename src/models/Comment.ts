@@ -1,3 +1,8 @@
+export enum COMMENT_LIKE {
+  ALREADY_LIKED = "ALREADY LIKED",
+  ALREADY_DISLIKED = "ALREADY DISLIKED"
+}
+
 export interface CommentDB {
   id: string;
   creator_id: string;
@@ -131,3 +136,11 @@ export class Comment {
     };
   }
 }
+
+
+export interface LikeDislikeDBComment {
+  user: string,
+  post_id: string,
+  like: number
+}
+

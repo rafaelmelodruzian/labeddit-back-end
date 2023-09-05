@@ -3,6 +3,7 @@ import { CreateCommentInputDTO } from '../dtos/comment/createComment';
 import { CommentBusiness } from '../business/CommentBusiness';
 import { ZodError } from "zod";
 import { BaseError } from "../errors/BaseError";
+import { LikeOrDislikeCommentSchema } from '../dtos/comment/likeOrDislikeComment';
 
 export class CommentController {
   constructor(private commentBusiness: CommentBusiness) {}
@@ -49,7 +50,6 @@ export class CommentController {
     }
   };
 
-// CommentController.ts
 
 public deleteComment = async (req: Request, res: Response) => {
   try {
@@ -69,5 +69,34 @@ public deleteComment = async (req: Request, res: Response) => {
     }
   }
 };
+
+
+public likeOrDislikeComment = async (req: Request, res: Response) => {
+  try {
+    const input = LikeOrDislikeCommentSchema.parse({
+      token: req.headers.authorization,
+      commentId: req.params.id,
+      like: req.body.like
+    })
+
+    const output = await this.commentBusiness.likeOrDislikeComment(input)
+
+    res.status(200).send(output)
+    
+  } catch (error) {
+    console.log(error)
+
+    if (error instanceof ZodError) {
+      res.status(400).send(error.issues)
+    } else if (error instanceof BaseError) {
+      res.status(error.statusCode).send(error.message)
+    } else {
+      res.status(500).send("Erro inesperado")
+    }
+  }
+}
+
+
+
 
 }
