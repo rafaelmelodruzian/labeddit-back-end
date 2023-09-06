@@ -139,8 +139,8 @@ export class Comment {
 
 
 export interface LikeDislikeDBComment {
-  user: string,
-  post_id: string,
+  user_id: string,
+  comment_id: string,
   like: number
 }
 

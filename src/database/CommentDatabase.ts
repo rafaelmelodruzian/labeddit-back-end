@@ -94,8 +94,8 @@ export class CommentDatabase extends BaseDatabase {
       .connection(CommentDatabase.TABLE_LIKES_DILIKES_COMMENTS)
       .select()
       .where({
-        user_id: likeDislikeDB.user,
-        comment_id: likeDislikeDB.post_id
+        user_id: likeDislikeDB.user_id,
+        comment_id: likeDislikeDB.comment_id
       })
 
     if (result === undefined) {
@@ -116,8 +116,8 @@ export class CommentDatabase extends BaseDatabase {
       .connection(CommentDatabase.TABLE_LIKES_DILIKES_COMMENTS)
       .delete()
       .where({
-        user_id: likeDislikeDB.user,
-        comment_id: likeDislikeDB.post_id
+        user_id: likeDislikeDB.user_id,
+        comment_id: likeDislikeDB.comment_id
       })
   }
 
@@ -129,8 +129,8 @@ export class CommentDatabase extends BaseDatabase {
       .connection(CommentDatabase.TABLE_LIKES_DILIKES_COMMENTS)
       .update(likeDislikeDB)
       .where({
-        user_id: likeDislikeDB.user,
-        comment_id: likeDislikeDB.post_id
+        user_id: likeDislikeDB.user_id,
+        comment_id: likeDislikeDB.comment_id
       })
   }
 

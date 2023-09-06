@@ -106,8 +106,8 @@ export class CommentBusiness {
     const likeSQlite = like ? 1 : 0
 
     const likeDislikeDB: LikeDislikeDBComment = {
-      user: payload.id,
-      post_id: commentId,
+      user_id: payload.id,
+      comment_id: commentId,
       like: likeSQlite
     }
 
