@@ -12,3 +12,6 @@ build
 
 # Arquivos com Extensão .db
 *.db
+
+# Arquivos de cobertura de testes do Jest
+coverage
