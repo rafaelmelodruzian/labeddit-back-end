@@ -112,9 +112,6 @@ A seguir, estão listados os endpoints disponíveis na API Labeddit:
    - URL: `http://localhost:3003/posts/:id/like`
    - Descrição: Permite que os usuários interajam com os posts através das ações de "like" e "dislike".
 
-10. **Verificar Reação do Usuário em um Post (GET)**
-    - URL: `http://localhost:3003/posts/:id/checklike`
-    - Descrição: Permite que os usuários obtenham a reação registrada para um post específico com base no ID fornecido.
 
 ### Comentários
 
@@ -138,9 +135,7 @@ A seguir, estão listados os endpoints disponíveis na API Labeddit:
     - URL: `http://localhost:3003/comments/:id/like`
     - Descrição: Permite que os usuários interajam com os comentários através das ações de "like" e "dislike".
 
-16. **Verificar Reação do Usuário em um Comentário (GET)**
-    - URL: `http://localhost:3003/comments/:id/checklike`
-    - Descrição: Permite que os usuários obtenham a reação registrada para um comentário específico com base no ID fornecido.
+
 
 <h2>Banco de Dados</h2>
 
