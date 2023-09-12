@@ -26,3 +26,5 @@ describe("Testando login", () => {
         })
     })
 })
+
+//Passou nos testes realizados

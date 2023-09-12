@@ -54,3 +54,5 @@ export class UserDatabaseMock extends BaseDatabase {
 
     }
 }
+
+//Passou nos testes realizados

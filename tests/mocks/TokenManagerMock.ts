@@ -36,3 +36,5 @@ export class TokenManagerMock {
         }
     }
 }
+
+//Passou nos testes realizados
