@@ -4,12 +4,8 @@ import { ZodError } from "zod";
 import { BaseError } from "../errors/BaseError";
 import { CreatePostSchema } from "../dtos/post/createPost";
 import { GetPostsSchema } from "../dtos/post/getPost";
-import { EditPostInputDTO, EditPostOutputDTO, EditPostSchema } from "../dtos/post/editPost";
-import { Post } from "../models/Post";
-import { ForbiddenError } from "../errors/ForbiddenError";
-import { NotFoundError } from "../errors/NotFoundError";
-import { UnauthorizedError } from "../errors/UnauthorizedError";
-import { DeletePostInputDTO, DeletePostSchema } from "../dtos/post/deletePost";
+import { EditPostSchema } from "../dtos/post/editPost";
+import { DeletePostInputDTO } from "../dtos/post/deletePost";
 import { LikeOrDislikePostSchema } from "../dtos/post/likeOrDislikePost";
 
 export class PostController {

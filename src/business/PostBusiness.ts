@@ -7,7 +7,6 @@ import { PostDatabase } from "../database/PostDatabase";
 import { CreatePostInputDTO, CreatePostOutputDTO } from "../dtos/post/createPost";
 import { LikeDislikeDB, POST_LIKE, Post } from "../models/Post";
 import { GetPostsInputDTO, GetPostsOutputDTO } from "../dtos/post/getPost";
-import { PostDBWithCreatorName } from "../models/Post";
 import { EditPostInputDTO, EditPostOutputDTO } from "../dtos/post/editPost";
 import { DeletePostInputDTO, DeletePostOutputDTO } from "../dtos/post/deletePost";
 import { USER_ROLES } from "../models/User";

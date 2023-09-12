@@ -6,7 +6,6 @@ import { CommentDatabase } from "../database/CommentDatabase";
 import { CreateCommentInputDTO } from "../dtos/comment/createComment";
 import { COMMENT_LIKE, Comment, CommentDB, LikeDislikeDBComment } from "../models/Comment";
 import { LikeOrDislikeCommentInputDTO, LikeOrDislikeCommentOutputDTO } from "../dtos/comment/likeOrDislikeComment";
-import { LikeDislikeDB } from "../models/Post";
 
 export class CommentBusiness {
   constructor(
