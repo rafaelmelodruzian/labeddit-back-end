@@ -54,11 +54,11 @@ export class CommentController {
 public deleteComment = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const token = req.headers.authorization as string; // Obtém o token do cabeçalho da solicitação
+    const token = req.headers.authorization as string; 
 
-    await this.commentBusiness.deleteComment(id, token); // Passe o token como segundo argumento
+    await this.commentBusiness.deleteComment(id, token); 
 
-    res.status(204).send();
+    res.status(201).send({ message: 'Comentário deletado com sucesso' });
   } catch (error) {
     console.log(error);
 
@@ -81,7 +81,7 @@ public likeOrDislikeComment = async (req: Request, res: Response) => {
 
     const output = await this.commentBusiness.likeOrDislikeComment(input)
 
-    res.status(200).send(output)
+    res.status(200).send({ message: 'Comentário curtido/descurtido com sucesso' });
     
   } catch (error) {
     console.log(error)
@@ -95,8 +95,4 @@ public likeOrDislikeComment = async (req: Request, res: Response) => {
     }
   }
 }
-
-
-
-
 }

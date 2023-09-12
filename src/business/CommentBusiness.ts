@@ -85,7 +85,7 @@ export class CommentBusiness {
       await this.commentDatabase.findPostsWithCreatorNameById(commentId)
 
     if (!CommentDBWithCreatorName) {
-      throw new NotFoundError("Não existe post com esse id")
+      throw new NotFoundError("Não existe commentário com esse id")
     }
 
     const comment = new Comment(
