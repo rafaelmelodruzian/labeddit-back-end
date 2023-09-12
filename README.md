@@ -31,7 +31,7 @@ git clone https://github.com/rafaelmelodruzian/labeddit-back-end.git
 <p>2. Acessar a pasta do projeto:</p>
 
 ```
-cd labeddit-backend
+cd labeddit-back-end
 ```
 
 <p>3. Instalar as dependências:</p>
@@ -146,4 +146,4 @@ A seguir, estão listados os endpoints disponíveis na API Labeddit:
 
 Diagrama do banco de dados, suas tabelas e relações:
 
-![Untitled](https://ibb.co/SQKMDLt)
+[Imgur](https://imgur.com/DX3Q8Bj)
