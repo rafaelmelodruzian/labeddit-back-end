@@ -151,4 +151,4 @@ A seguir, estão listados os endpoints disponíveis na API Labeddit:
 
 Diagrama do banco de dados, suas tabelas e relações:
 
-[Cliqueaqui](https://raw.githubusercontent.com/rafaelmelodruzian/labeddit-back-end/main/src/Assets/Tabelas%20DB.png)
+[Clique aqui](https://raw.githubusercontent.com/rafaelmelodruzian/labeddit-back-end/main/src/Assets/Tabelas%20DB.png)
