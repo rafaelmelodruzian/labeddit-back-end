@@ -1,241 +1,216 @@
-import { ForbiddenError } from "../errors/ForbiddenError";
-import { NotFoundError } from "../errors/NotFoundError";
-import { UnauthorizedError } from "../errors/UnauthorizedError";
-import { IdGenerator } from "../services/IdGenerator";
-import { TokenManager } from "../services/TokenManager";
-import { PostDatabase } from "../database/PostDatabase";
-import { CreatePostInputDTO, CreatePostOutputDTO } from "../dtos/post/createPost";
-import { LikeDislikeDB, POST_LIKE, Post } from "../models/Post";
-import { GetPostsInputDTO, GetPostsOutputDTO } from "../dtos/post/getPost";
-import { PostDBWithCreatorName } from "../models/Post";
-import { EditPostInputDTO, EditPostOutputDTO } from "../dtos/post/editPost";
-import { DeletePostInputDTO, DeletePostOutputDTO } from "../dtos/post/deletePost";
-import { USER_ROLES } from "../models/User";
-import { LikeOrDislikePostInputDTO, LikeOrDislikePostOutputDTO } from "../dtos/post/likeOrDislikePost";
+import { PostDatabase } from '../database/PostDatabase';
+import { CreatePostInputDTO } from '../dtos/posts/createPost.dto';
+import { DeletePostInputDTO } from '../dtos/posts/deletePost.dto';
+import { EditPostInputDTO } from '../dtos/posts/editPost.dto';
+import {
+	GetPostsInputDTO,
+	GetPostsOutputDTO,
+} from '../dtos/posts/getPosts.dto';
+import { LikePostInputDTO, LikeStatus } from '../dtos/posts/likePost.dto';
+import { BadRequestError } from '../errors/BadRequestError';
+import { NotFoundError } from '../errors/NotFoundError';
+import { LikesDislikes, PostLikeDB } from '../models/LikeDislike';
+import { Post, PostDB, PostDBGet, PostModel } from '../models/Post';
+import { IdGenerator } from '../services/IdGenerator';
+import { TokenManager } from '../services/TokenManager';
 
 export class PostBusiness {
-  constructor(
-    private postDatabase: PostDatabase,
-    private idGenerator: IdGenerator,
-    private tokenManager: TokenManager
-  ) { }
+	constructor(
+		private idGenerator: IdGenerator,
+		private tokenManager: TokenManager,
+		private postDatabase: PostDatabase
+	) {}
 
-  public createPost = async (
-    input: CreatePostInputDTO
-  ): Promise<CreatePostOutputDTO> => {
-    const { content, token } = input
+	public getPosts = async (
+		input: GetPostsInputDTO
+	): Promise<GetPostsOutputDTO> => {
+		const payload = this.tokenManager.getPayload(input.token);
 
-    const payload = this.tokenManager.getPayload(token)
+		if (payload === null) {
+			throw new BadRequestError('Token inválido');
+		}
 
-    if (!payload) {
-      throw new UnauthorizedError()
-    }
+		const postsDB: PostDBGet[] = await this.postDatabase.getPosts();
+		const posts = postsDB.map((postDB) => {
+			const post = new Post(
+				postDB.id,
+				postDB.creator_id,
+				postDB.content,
+				postDB.likes,
+				postDB.dislikes,
+				postDB.created_at
+			);
+			return post.toBusinessModel(postDB.nick, postDB.comments);
+		});
 
-    const id = this.idGenerator.generate()
+		const output: GetPostsOutputDTO = posts;
+		return output;
+	};
 
-    const post = new Post(
-      id,
-      content,
-      0,
-      0,
-      new Date().toISOString(),
-      new Date().toISOString(),
-      payload.id,
-      payload.name
-    )
+	public createPost = async (input: CreatePostInputDTO): Promise<void> => {
+		const { content, token } = input;
 
-    const postDB = post.toDBModel()
-    await this.postDatabase.insertPost(postDB)
+		const payload = this.tokenManager.getPayload(token);
+		const id = this.idGenerator.generate();
 
-    const output: CreatePostOutputDTO = undefined
+		if (payload === null) {
+			throw new BadRequestError('Token inválido');
+		}
 
-    return output
-  }
+		const newPost = new Post(
+			id,
+			payload.id,
+			content,
+			0,
+			0,
+			new Date().toISOString()
+		);
 
-  public getPosts = async (
-    input: GetPostsInputDTO
-  ): Promise<GetPostsOutputDTO> => {
-    const { token } = input
+		const newPostDB = newPost.toDBModel();
+		await this.postDatabase.insertPost(newPostDB);
+	};
 
-    const payload = this.tokenManager.getPayload(token)
+	public editPost = async (input: EditPostInputDTO): Promise<void> => {
+		const { id, token, content } = input;
 
-    if (!payload) {
-      throw new UnauthorizedError()
-    }
+		const payload = this.tokenManager.getPayload(token);
 
-    const postsDBwithCreatorName =
-      await this.postDatabase.getPostsWithCreatorName()
+		if (payload === null) {
+			throw new BadRequestError('Token inválido');
+		}
 
-    const posts = postsDBwithCreatorName
-      .map((postWithCreatorName) => {
-        const post = new Post(
-          postWithCreatorName.id,
-          postWithCreatorName.content,
-          postWithCreatorName.likes,
-          postWithCreatorName.dislikes,
-          postWithCreatorName.created_at,
-          postWithCreatorName.updated_at,
-          postWithCreatorName.creator_id,
-          postWithCreatorName.creator_name
-        )
+		const post: PostDB = await this.postDatabase.getPostById(id);
 
-        return post.toBusinessModel()
-      })
+		if (!post) {
+			throw new NotFoundError('Post não encontrado');
+		}
 
-    const output: GetPostsOutputDTO = posts
+		if (payload.id !== post.creator_id) {
+			throw new BadRequestError(
+				'Somente quem criou o post pode editá-lo'
+			);
+		}
 
-    return output
-  }
+		const newPost = new Post(
+			post.id,
+			post.creator_id,
+			content,
+			post.likes,
+			post.dislikes,
+			post.created_at
+		);
 
+		await this.postDatabase.editPost(newPost.toDBModel());
+	};
 
+	public deletePost = async (input: DeletePostInputDTO): Promise<void> => {
+		const { id, token } = input;
 
-  public editPost = async (
-    input: EditPostInputDTO
-  ): Promise<EditPostOutputDTO> => {
-    const { content, token, idToEdit } = input
+		const payload = this.tokenManager.getPayload(token);
 
-    const payload = this.tokenManager.getPayload(token)
+		if (payload === null) {
+			throw new BadRequestError('Token inválido');
+		}
 
-    if (!payload) {
-      throw new UnauthorizedError()
-    }
+		const post: PostDB = await this.postDatabase.getPostById(id);
 
-    const postDB = await this.postDatabase
-      .findPostById(idToEdit)
+		if (!post) {
+			throw new NotFoundError('Post não encontrado');
+		}
 
-    if (!postDB) {
-      throw new NotFoundError("post com essa id não existe")
-    }
+		if (payload.id !== post.creator_id) {
+			throw new BadRequestError('Só quem criou o post pode deletá-lo');
+		}
 
-    if (payload.id !== postDB.creator_id) {
-      throw new ForbiddenError("somente quem criou a post pode editá-la")
-    }
+		await this.postDatabase.deletePost(id, payload.id);
+	};
 
-    const post = new Post(
-      postDB.id,
-      postDB.content,
-      postDB.likes,
-      postDB.dislikes,
-      postDB.created_at,
-      postDB.updated_at,
-      postDB.creator_id,
-      payload.name
-    )
+	public likePost = async (input: LikePostInputDTO): Promise<void> => {
+		const { id, token, like } = input;
 
-    post.setContent(content)
+		const payload = this.tokenManager.getPayload(token);
+		if (payload === null) {
+			throw new BadRequestError('Token inválido');
+		}
 
-    const updatedPostDB = post.toDBModel()
-    await this.postDatabase.updatePost(updatedPostDB)
+		const post: PostDB = await this.postDatabase.getPostById(id);
+		if (!post) {
+			throw new NotFoundError('Post não encontrado');
+		}
 
-    const output: EditPostOutputDTO = undefined
+		const intLike = like ? 1 : 0;
+		const checkLike: PostLikeDB = await this.postDatabase.getLikesById(
+			payload.id,
+			id
+		);
 
-    return output
-  }
+		if (!checkLike) {
+			const newLike = new LikesDislikes(payload.id, id, like);
+			const newLikeDB = newLike.toDBModel();
 
+			await this.postDatabase.insertLikeDislike(newLikeDB);
+		} else if (checkLike.like === intLike) {
+			await this.postDatabase.deleteLikeDislike(payload.id, id);
+		} else {
+			const newLike = new LikesDislikes(payload.id, id, like);
+			const newLikeDB = newLike.toDBModel();
 
-  public deletePost = async (
-    input: DeletePostInputDTO
-  ): Promise<DeletePostOutputDTO> => {
-    const { token, idToDelete } = input
+			await this.postDatabase.updateLikeDislike(newLikeDB);
+		}
+	};
 
-    const payload = this.tokenManager.getPayload(token)
+	public checkLike = async (
+		input: DeletePostInputDTO
+	): Promise<LikeStatus> => {
+		const { id, token } = input;
 
-    if (!payload) {
-      throw new UnauthorizedError()
-    }
+		const payload = this.tokenManager.getPayload(token);
+		if (payload === null) {
+			throw new BadRequestError('Token inválido');
+		}
 
-    const postDB = await this.postDatabase
-      .findPostById(idToDelete)
+		const post: PostDB = await this.postDatabase.getPostById(id);
+		if (!post) {
+			throw new NotFoundError('Post não encontrado');
+		}
 
-    if (!postDB) {
-      throw new NotFoundError("post com essa id não existe")
-    }
+		const checkLike: PostLikeDB = await this.postDatabase.getLikesById(
+			payload.id,
+			id
+		);
 
-    if (payload.role !== USER_ROLES.ADMIN) {
-      if (payload.id !== postDB.creator_id) {
-        throw new ForbiddenError("somente quem criou a post pode editá-la")
-      }
-    }
+		if (!checkLike) {
+			return LikeStatus.None;
+		} else if (checkLike.like == 1) {
+			return LikeStatus.Like;
+		} else {
+			return LikeStatus.Dislike;
+		}
+	};
 
-    await this.postDatabase.deletePostById(idToDelete)
+	public getPostById = async (
+		input: DeletePostInputDTO
+	): Promise<PostModel> => {
+		const { id, token } = input;
 
-    const output: DeletePostOutputDTO = undefined
+		const payload = this.tokenManager.getPayload(token);
+		if (payload === null) {
+			throw new BadRequestError('Token inválido');
+		}
 
-    return output
-  }
+		const postDB: PostDBGet = await this.postDatabase.getPostById(id);
+		if (!postDB) {
+			// throw new NotFoundError('Post não encontrado');
+		}
 
-
-  public likeOrDislikePost = async (
-    input: LikeOrDislikePostInputDTO
-  ): Promise<LikeOrDislikePostOutputDTO> => {
-    const { token, like, postId } = input
-
-    const payload = this.tokenManager.getPayload(token)
-
-    if (!payload) {
-      throw new UnauthorizedError()
-    }
-
-    const PostDBWithCreatorName =
-      await this.postDatabase.findPostsWithCreatorNameById(postId)
-
-    if (!PostDBWithCreatorName) {
-      throw new NotFoundError("Não existe post com esse id")
-    }
-
-    const post = new Post(
-      PostDBWithCreatorName.id,
-      PostDBWithCreatorName.content,
-      PostDBWithCreatorName.likes,
-      PostDBWithCreatorName.dislikes,
-      PostDBWithCreatorName.created_at,
-      PostDBWithCreatorName.updated_at,
-      PostDBWithCreatorName.creator_id,
-      PostDBWithCreatorName.creator_name
-    )
-
-    const likeSQlite = like ? 1 : 0
-
-    const likeDislikeDB: LikeDislikeDB = {
-      user_id: payload.id,
-      post_id: postId,
-      like: likeSQlite
-    }
-
-    const likeDislikeExists =
-      await this.postDatabase.findLikeDislike(likeDislikeDB)
-
-    if (likeDislikeExists === POST_LIKE.ALREADY_LIKED) {
-      if (like) {
-        await this.postDatabase.removeLikeDislike(likeDislikeDB)
-        post.removeLike()
-      } else {
-        await this.postDatabase.updateLikeDislike(likeDislikeDB)
-        post.removeLike()
-        post.addDislike()
-      }
-
-    } else if (likeDislikeExists === POST_LIKE.ALREADY_DISLIKED) {
-      if (like === false) {
-        await this.postDatabase.removeLikeDislike(likeDislikeDB)
-        post.removeDislike()
-      } else {
-        await this.postDatabase.updateLikeDislike(likeDislikeDB)
-        post.removeDislike()
-        post.addLike()
-      }
-
-    } else {
-      await this.postDatabase.insertLikeDislike(likeDislikeDB)
-      like ? post.addLike() : post.addDislike()
-    }
-
-    const updatedPostDB = post.toDBModel()
-    await this.postDatabase.updatePost(updatedPostDB)
-
-    const output: LikeOrDislikePostOutputDTO = undefined
-
-    return output
-  }
+		const post = new Post(
+			postDB.id,
+			postDB.creator_id,
+			postDB.content,
+			postDB.likes,
+			postDB.dislikes,
+			postDB.created_at
+		);
+		return post.toBusinessModel(postDB.nick, postDB.comments);
+	};
 }
-

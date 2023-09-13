@@ -1,147 +1,113 @@
-import { BaseDatabase } from "./BaseDatabase";
-import { COMMENT_LIKE, CommentDB, CommentDBWithCreatorName } from "../models/Comment";
-import { NotFoundError } from "../errors/NotFoundError";
-import { LikeDislikeDBComment } from "../models/Comment";
-import { UserDatabase } from "./UserDatabase";
+import { CommentLikeDB } from '../models/LikeDislike';
+import { CommentDB, CommentDBGet } from '../models/Comment';
+import { BaseDataBase } from './BaseDatabase';
 
+export class CommentDatabase extends BaseDataBase {
+	public static TABLE_COMMENTS = 'comments';
+	public static TABLE_LIKES_DISLIKES = 'comments_likes_dislikes';
 
-export class CommentDatabase extends BaseDatabase {
-  public static TABLE_COMMENTS = "comments";
-  public static TABLE_LIKES_DILIKES_COMMENTS = "likes_dislikes_comments"
+	public async getComments(id: string): Promise<CommentDBGet[]> {
+		const comment: CommentDBGet[] = await BaseDataBase.connection(
+			CommentDatabase.TABLE_COMMENTS
+		)
+			.select(
+				'comments.id',
+				'comments.post_id',
+				'comments.creator_id',
+				'comments.content',
+				'comments.created_at',
+				'users.nick',
+				BaseDataBase.connection
+					.count('comments_likes_dislikes.like as likes')
+					.from('comments_likes_dislikes')
+					.whereRaw(
+						'comments_likes_dislikes.comment_id = comments.id and comments_likes_dislikes.like = 1'
+					)
+					.as('likes'),
+				BaseDataBase.connection
+					.count('comments_likes_dislikes.like as dislikes')
+					.from('comments_likes_dislikes')
+					.whereRaw(
+						'comments_likes_dislikes.comment_id = comments.id and comments_likes_dislikes.like = 0'
+					)
+					.as('dislikes')
+			)
+			.innerJoin('users', 'comments.creator_id', '=', 'users.id')
+			.leftJoin(
+				'comments_likes_dislikes',
+				'comments.id',
+				'=',
+				'comments_likes_dislikes.comment_id'
+			)
+			.groupBy('comments.id')
+			.where('comments.post_id', '=', id);
+		return comment;
+	}
 
-  public insertComment = async (commentDB: CommentDB): Promise<void> => {
-    await BaseDatabase.connection(CommentDatabase.TABLE_COMMENTS).insert(
-      commentDB
-    );
-  };
+	public async getCommentById(id: string): Promise<CommentDB> {
+		const [comment]: CommentDB[] = await BaseDataBase.connection(
+			CommentDatabase.TABLE_COMMENTS
+		).where({ id });
+		return comment;
+	}
 
-  public getCommentsByPost = async (post_id: string): Promise<CommentDB[]> => {
-    const comments = await BaseDatabase.connection(CommentDatabase.TABLE_COMMENTS)
-      .select("comments.*", "users.name as creator_name")
-      .join("users", "comments.creator_id", "users.id")
-      .where({ post_id });
+	public async insertComment(newCommentDB: CommentDB): Promise<void> {
+		await BaseDataBase.connection(CommentDatabase.TABLE_COMMENTS).insert(
+			newCommentDB
+		);
+	}
 
-    return comments;
-  };
+	public async editComment(comment: CommentDB): Promise<void> {
+		await BaseDataBase.connection(CommentDatabase.TABLE_COMMENTS)
+			.update(comment)
+			.where({ id: comment.id });
+	}
 
+	public async deleteComment(id: string): Promise<void> {
+		await BaseDataBase.connection(CommentDatabase.TABLE_LIKES_DISLIKES)
+			.del()
+			.where('comment_id', '=', id);
+		await BaseDataBase.connection(CommentDatabase.TABLE_COMMENTS)
+			.del()
+			.where({ id });
+	}
 
-  public findCommentById = async (id: string): Promise<CommentDB | undefined> => {
-    const result = await BaseDatabase.connection(CommentDatabase.TABLE_COMMENTS)
-      .select()
-      .where({ id })
-      .first();
+	public async getLikesById(
+		userId: string,
+		commentId: string
+	): Promise<CommentLikeDB> {
+		const [likes] = await BaseDataBase.connection(
+			CommentDatabase.TABLE_LIKES_DISLIKES
+		)
+			.where('user_id', '=', userId)
+			.andWhere('comment_id', '=', commentId);
+		return likes;
+	}
 
-    return result as CommentDB | undefined;
-  };
+	public async insertLikeDislike(
+		newCommentLike: CommentLikeDB
+	): Promise<void> {
+		await BaseDataBase.connection(
+			CommentDatabase.TABLE_LIKES_DISLIKES
+		).insert(newCommentLike);
+	}
 
+	public async deleteLikeDislike(
+		userId: string,
+		commentId: string
+	): Promise<void> {
+		await BaseDataBase.connection(CommentDatabase.TABLE_LIKES_DISLIKES)
+			.del()
+			.where('user_id', '=', userId)
+			.andWhere('comment_id', '=', commentId);
+	}
 
-  public deleteComment = async (id: string): Promise<void> => {
-    const deletedCount = await BaseDatabase.connection(CommentDatabase.TABLE_COMMENTS)
-      .delete()
-      .where({ id });
-
-    if (deletedCount === 0) {
-      throw new NotFoundError('Comentário não encontrado');
-    }
-  };
-
-
-
-  //LIKE OR DISLIKE 
-
-
-  public updateComment = async (
-    CommentDB: CommentDB
-  ): Promise<void> => {
-    await BaseDatabase
-      .connection(CommentDatabase.TABLE_COMMENTS)
-      .update(CommentDB)
-      .where({ id: CommentDB.id })
-  }
-
-  public findPostsWithCreatorNameById =
-    async (id: string): Promise<CommentDBWithCreatorName | undefined> => {
-
-      const [result] = await BaseDatabase
-        .connection(CommentDatabase.TABLE_COMMENTS)
-        .select(
-          `${CommentDatabase.TABLE_COMMENTS}.id`,
-          `${CommentDatabase.TABLE_COMMENTS}.creator_id`,
-          `${CommentDatabase.TABLE_COMMENTS}.content`,
-          `${CommentDatabase.TABLE_COMMENTS}.likes`,
-          `${CommentDatabase.TABLE_COMMENTS}.dislikes`,
-          `${CommentDatabase.TABLE_COMMENTS}.created_at`,
-          `${CommentDatabase.TABLE_COMMENTS}.updated_at`,
-          `${UserDatabase.TABLE_USERS}.name as creator_name`
-        )
-        .join(
-          `${UserDatabase.TABLE_USERS}`,
-          `${CommentDatabase.TABLE_COMMENTS}.creator_id`,
-          "=",
-          `${UserDatabase.TABLE_USERS}.id`
-        )
-        .where({ [`${CommentDatabase.TABLE_COMMENTS}.id`]: id })
-
-      return result as CommentDBWithCreatorName | undefined
-    }
-
-
-  public findLikeDislike = async (
-    likeDislikeDB: LikeDislikeDBComment
-  ): Promise<COMMENT_LIKE | undefined> => {
-
-    const [result]: Array<LikeDislikeDBComment | undefined> = await BaseDatabase
-      .connection(CommentDatabase.TABLE_LIKES_DILIKES_COMMENTS)
-      .select()
-      .where({
-        user_id: likeDislikeDB.user_id,
-        comment_id: likeDislikeDB.comment_id
-      })
-
-    if (result === undefined) {
-      return undefined
-
-    } else if (result.like === 1) {
-      return COMMENT_LIKE.ALREADY_LIKED
-
-    } else {
-      return COMMENT_LIKE.ALREADY_DISLIKED
-    }
-  }
-
-  public removeLikeDislike = async (
-    likeDislikeDB: LikeDislikeDBComment
-  ): Promise<void> => {
-    await BaseDatabase
-      .connection(CommentDatabase.TABLE_LIKES_DILIKES_COMMENTS)
-      .delete()
-      .where({
-        user_id: likeDislikeDB.user_id,
-        comment_id: likeDislikeDB.comment_id
-      })
-  }
-
-
-  public updateLikeDislike = async (
-    likeDislikeDB: LikeDislikeDBComment
-  ): Promise<void> => {
-    await BaseDatabase
-      .connection(CommentDatabase.TABLE_LIKES_DILIKES_COMMENTS)
-      .update(likeDislikeDB)
-      .where({
-        user_id: likeDislikeDB.user_id,
-        comment_id: likeDislikeDB.comment_id
-      })
-  }
-
-  public insertLikeDislike = async (
-    likeDislikeDB: LikeDislikeDBComment
-  ): Promise<void> => {
-    await BaseDatabase
-      .connection(CommentDatabase.TABLE_LIKES_DILIKES_COMMENTS)
-      .insert(likeDislikeDB)
-
-  }
-
-
+	public async updateLikeDislike(
+		commentLikeDB: CommentLikeDB
+	): Promise<void> {
+		await BaseDataBase.connection(CommentDatabase.TABLE_LIKES_DISLIKES)
+			.update(commentLikeDB)
+			.where('user_id', '=', commentLikeDB.user_id)
+			.andWhere('comment_id', '=', commentLikeDB.comment_id);
+	}
 }

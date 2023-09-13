@@ -1,14 +1,16 @@
+![Banner](https://github.com/FelipeG-Almeida/labeddit-frontend/assets/73674044/06ebc5a6-9abc-4631-b8c8-9099770ccb60)
+
 <h1 align="center" id="title">Labeddit Backend</h1>
 
-<p id="description">Bem-vindos ao Labeddit! Uma rede social inspirada no reddit. Este é o repositório do backend do Projeto. Desenvolvido usando NodeJs, Typescript, Express e SQLite. Este é o projeto final do curso full-stack da Labenu </p>
+<p id="description">Bem-vindos ao Labeddit! 😎 Uma rede social inspirada no reddit. Esta é o repositório do backend do Projeto. Desenvolvido usando NodeJs, Typescript, Express e SQLite. Este é o projeto final que coroa nosso percurso pelo curso full-stack da Labenu 🧡</p>
 
 <p align="center"><img src="https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&amp;logo=node.js&amp;logoColor=white" alt="shields"><img src="https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&amp;logo=typescript&amp;logoColor=white" alt="shields"><img src="https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&amp;logo=express&amp;logoColor=%2361DAFB" alt="shields"><img src="https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&amp;logo=sqlite&amp;logoColor=white" alt="shields"><img src="https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&amp;logo=jest&amp;logoColor=white" alt="shields"><img src="https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&amp;logo=postman&amp;logoColor=white" alt="shields"></p>
 
 <h2>📜 Documentação da API</h2>
 
-A documentação da API pode ser encontrada no [Postman](https://documenter.getpostman.com/view/27736274/2s9YC4TXck), que fornece detalhes sobre os endpoints disponíveis, parâmetros de entrada, exemplos de solicitações e respostas.
+A documentação da API pode ser encontrada no [Postman](https://documenter.getpostman.com/view/24823235/2s9XxyRtDt), que fornece detalhes sobre os endpoints disponíveis, parâmetros de entrada, exemplos de solicitações e respostas.
 
-Repositório do Front-end: [Labeddit Front End](https://github.com/rafaelmelodruzian/labeddit-front-end)
+Repositório do Front-end: [https://github.com/FelipeG-Almeida/labeddit-frontend](https://github.com/FelipeG-Almeida/labeddit-frontend)
   
 <h2>🧐 Funcionalidades</h2>
 
@@ -25,13 +27,13 @@ Para configurar o projeto em sua máquina local, siga os passos abaixo:
 <p>1. Clonar o repositório:</p>
 
 ```
-git clone https://github.com/rafaelmelodruzian/labeddit-back-end.git
+git clone https://github.com/FelipeG-Almeida/labeddit-backend.git
 ```
 
 <p>2. Acessar a pasta do projeto:</p>
 
 ```
-cd labeddit-back-end
+cd labeddit-backend
 ```
 
 <p>3. Instalar as dependências:</p>
@@ -43,7 +45,7 @@ npm install
 <p>4. Configurar variáveis de ambiente:</p>
 
 ```
-PORT=3003 DB_FILE_PATH=./src/database/labeddit.db JWT_KEY=Labeddit123! JWT_EXPIRES_IN=100d BCRYPT_COST=12
+PORT=3003 DB_FILE_PATH=./src/database/labeddit.db JWT_KEY=sua-senha JWT_EXPIRES_IN=7d BCRYPT_COST=12
 ```
 
 <p>5. Crie as tabelas do banco usando o arquivo labeddit.sql</p>
@@ -54,7 +56,8 @@ PORT=3003 DB_FILE_PATH=./src/database/labeddit.db JWT_KEY=Labeddit123! JWT_EXPIR
 npm run dev
 ```
 
-    
+  
+  
 <h2>💻 Construído com</h2>
 
 Técnologias e Métodologias Utilizadas:
@@ -86,7 +89,11 @@ A seguir, estão listados os endpoints disponíveis na API Labeddit:
    - URL: `http://localhost:3003/users/login`
    - Descrição: Permite que os usuários façam login na plataforma Labeddit.
 
-### Posts
+3. **Obter o ID do Usuário (GET)**
+   - URL: `http://localhost:3003/users/`
+   - Descrição: Permite que os usuários obtenham o ID do usuário autenticado com base no Token JWT.
+
+### Publicações
 
 4. **Obter Todos os Posts (GET)**
    - URL: `http://localhost:3003/posts/`
@@ -112,6 +119,9 @@ A seguir, estão listados os endpoints disponíveis na API Labeddit:
    - URL: `http://localhost:3003/posts/:id/like`
    - Descrição: Permite que os usuários interajam com os posts através das ações de "like" e "dislike".
 
+10. **Verificar Reação do Usuário em um Post (GET)**
+    - URL: `http://localhost:3003/posts/:id/checklike`
+    - Descrição: Permite que os usuários obtenham a reação registrada para um post específico com base no ID fornecido.
 
 ### Comentários
 
@@ -135,9 +145,12 @@ A seguir, estão listados os endpoints disponíveis na API Labeddit:
     - URL: `http://localhost:3003/comments/:id/like`
     - Descrição: Permite que os usuários interajam com os comentários através das ações de "like" e "dislike".
 
+16. **Verificar Reação do Usuário em um Comentário (GET)**
+    - URL: `http://localhost:3003/comments/:id/checklike`
+    - Descrição: Permite que os usuários obtenham a reação registrada para um comentário específico com base no ID fornecido.
 
-<h2>Banco de Dados</h2>
+<h2>🎲 Banco de Dados</h2>
 
 Diagrama do banco de dados, suas tabelas e relações:
 
-[Imgur](https://imgur.com/DX3Q8Bj)
+![Untitled](https://github.com/FelipeG-Almeida/labeddit-backend/assets/73674044/b95dc80a-b4e6-4582-a8bb-38b6c682ba52)

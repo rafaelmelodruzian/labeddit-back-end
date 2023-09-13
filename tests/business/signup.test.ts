@@ -29,4 +29,3 @@ describe("Testando signup", () => {
 });
 
 
-//Passou nos testes realizados
