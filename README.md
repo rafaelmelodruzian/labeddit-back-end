@@ -25,13 +25,13 @@ Para configurar o projeto em sua máquina local, siga os passos abaixo:
 <p>1. Clonar o repositório:</p>
 
 ```
-git clone https://github.com/rafaelmelodruzian/labeddit-front-end.git
+git clone https://github.com/rafaelmelodruzian/labeddit-back-end.git
 ```
 
 <p>2. Acessar a pasta do projeto:</p>
 
 ```
-cd labeddit-backend
+cd labeddit-back-end
 ```
 
 <p>3. Instalar as dependências:</p>
@@ -151,4 +151,4 @@ A seguir, estão listados os endpoints disponíveis na API Labeddit:
 
 Diagrama do banco de dados, suas tabelas e relações:
 
-[Clique aqui](http://Alterar)
+[Clique aqui]([http://Alterar](https://raw.githubusercontent.com/rafaelmelodruzian/labeddit-back-end/main/src/Assets/Tabelas%20DB.png)https://raw.githubusercontent.com/rafaelmelodruzian/labeddit-back-end/main/src/Assets/Tabelas%20DB.png)
