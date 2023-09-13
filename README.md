@@ -9,6 +9,7 @@
 A documentação da API pode ser encontrada no [Postman](https://documenter.getpostman.com/view/24823235/2s9XxyRtDt), que fornece detalhes sobre os endpoints disponíveis, parâmetros de entrada, exemplos de solicitações e respostas.
 
 Repositório do Front-end: https://github.com/rafaelmelodruzian/labeddit-front-end
+
 Link deste projeto com deploy no render: https://rafael-druzian-labeddit.onrender.com
   
 <h2>🧐 Funcionalidades</h2>
