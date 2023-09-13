@@ -200,7 +200,7 @@ export class PostBusiness {
 
 		const postDB: PostDBGet = await this.postDatabase.getPostById(id);
 		if (!postDB) {
-			// throw new NotFoundError('Post não encontrado');
+			throw new NotFoundError('Post não encontrado');
 		}
 
 		const post = new Post(
