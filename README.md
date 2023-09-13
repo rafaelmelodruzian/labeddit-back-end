@@ -8,7 +8,7 @@
 
 A documentação da API pode ser encontrada no [Postman](https://documenter.getpostman.com/view/24823235/2s9XxyRtDt), que fornece detalhes sobre os endpoints disponíveis, parâmetros de entrada, exemplos de solicitações e respostas.
 
-Repositório do Front-end: [Clique Aqui](https://github.com/rafaelmelodruzian/labeddit-front-end)
+Repositório do Front-end: https://github.com/rafaelmelodruzian/labeddit-front-end
   
 <h2>🧐 Funcionalidades</h2>
 
@@ -151,4 +151,4 @@ A seguir, estão listados os endpoints disponíveis na API Labeddit:
 
 Diagrama do banco de dados, suas tabelas e relações:
 
-[Clique aqui]([http://Alterar](https://raw.githubusercontent.com/rafaelmelodruzian/labeddit-back-end/main/src/Assets/Tabelas%20DB.png)https://raw.githubusercontent.com/rafaelmelodruzian/labeddit-back-end/main/src/Assets/Tabelas%20DB.png)
+[Cliqueaqui](https://raw.githubusercontent.com/rafaelmelodruzian/labeddit-back-end/main/src/Assets/Tabelas%20DB.png)
