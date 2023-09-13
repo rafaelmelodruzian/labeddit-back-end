@@ -11,15 +11,13 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/FelipeG-Almeida/labeddit-backend.git"
+		"url": "git+https://github.com/rafaelmelodruzian/labecommerce-backend"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
-	"bugs": {
-		"url": "https://github.com/FelipeG-Almeida/labeddit-backend/issues"
-	},
-	"homepage": "https://github.com/FelipeG-Almeida/labeddit-backend#readme",
+	
+
 	"devDependencies": {
 		"@types/bcryptjs": "^2.4.2",
 		"@types/cors": "^2.8.13",

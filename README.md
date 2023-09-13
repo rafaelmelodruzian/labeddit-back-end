@@ -1,8 +1,6 @@
-![Banner](https://github.com/FelipeG-Almeida/labeddit-frontend/assets/73674044/06ebc5a6-9abc-4631-b8c8-9099770ccb60)
-
 <h1 align="center" id="title">Labeddit Backend</h1>
 
-<p id="description">Bem-vindos ao Labeddit! 😎 Uma rede social inspirada no reddit. Esta é o repositório do backend do Projeto. Desenvolvido usando NodeJs, Typescript, Express e SQLite. Este é o projeto final que coroa nosso percurso pelo curso full-stack da Labenu 🧡</p>
+<p id="description">Bem-vindos ao Labeddit! 😎 Uma rede social inspirada no reddit. Esta é o repositório do backend do Projeto. Desenvolvido usando NodeJs, Typescript, Express e SQLite. Este é o projeto final que coroa nosso percurso pelo curso full-stack da Labenu </p>
 
 <p align="center"><img src="https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&amp;logo=node.js&amp;logoColor=white" alt="shields"><img src="https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&amp;logo=typescript&amp;logoColor=white" alt="shields"><img src="https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&amp;logo=express&amp;logoColor=%2361DAFB" alt="shields"><img src="https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&amp;logo=sqlite&amp;logoColor=white" alt="shields"><img src="https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&amp;logo=jest&amp;logoColor=white" alt="shields"><img src="https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&amp;logo=postman&amp;logoColor=white" alt="shields"></p>
 
@@ -10,7 +8,7 @@
 
 A documentação da API pode ser encontrada no [Postman](https://documenter.getpostman.com/view/24823235/2s9XxyRtDt), que fornece detalhes sobre os endpoints disponíveis, parâmetros de entrada, exemplos de solicitações e respostas.
 
-Repositório do Front-end: [https://github.com/FelipeG-Almeida/labeddit-frontend](https://github.com/FelipeG-Almeida/labeddit-frontend)
+Repositório do Front-end: [Clique Aqui](https://github.com/rafaelmelodruzian/labeddit-front-end)
   
 <h2>🧐 Funcionalidades</h2>
 
@@ -27,7 +25,7 @@ Para configurar o projeto em sua máquina local, siga os passos abaixo:
 <p>1. Clonar o repositório:</p>
 
 ```
-git clone https://github.com/FelipeG-Almeida/labeddit-backend.git
+git clone https://github.com/rafaelmelodruzian/labeddit-front-end.git
 ```
 
 <p>2. Acessar a pasta do projeto:</p>
@@ -153,4 +151,4 @@ A seguir, estão listados os endpoints disponíveis na API Labeddit:
 
 Diagrama do banco de dados, suas tabelas e relações:
 
-![Untitled](https://github.com/FelipeG-Almeida/labeddit-backend/assets/73674044/b95dc80a-b4e6-4582-a8bb-38b6c682ba52)
+[Clique aqui](http://Alterar)
