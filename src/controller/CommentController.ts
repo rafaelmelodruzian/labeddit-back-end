@@ -1,98 +1,154 @@
-import { Request, Response } from 'express';
-import { CreateCommentInputDTO } from '../dtos/comment/createComment';
-import { CommentBusiness } from '../business/CommentBusiness';
+import { Request, Response } from "express";
+import { CommentBusiness } from "../business/CommentBusiness";
+import { getCommentsSchema } from "../dtos/comments/getComment.dto";
 import { ZodError } from "zod";
 import { BaseError } from "../errors/BaseError";
-import { LikeOrDislikeCommentSchema } from '../dtos/comment/likeOrDislikeComment';
+import { createCommentSchema } from "../dtos/comments/createComment.dto";
+import { editCommentSchema } from "../dtos/comments/editComment.dto";
+import { deleteCommentSchema } from "../dtos/comments/deleteComment.dto";
+import { likeCommentChema } from "../dtos/comments/likeComment.dto";
 
 export class CommentController {
-  constructor(private commentBusiness: CommentBusiness) {}
+    constructor(private commentBusiness: CommentBusiness) {}
 
-  public createComment = async (req: Request, res: Response) => {
-    try {
-      const token = req.headers.authorization as string;
-      const { content } = req.body;
-      const { post_id } = req.params;
+	public getComments = async (req: Request, res: Response) => {
+		try {
+			const input = getCommentsSchema.parse({
+				id: req.params.id,
+				token: req.headers.authorization,
+			});
 
-      const input: CreateCommentInputDTO = { content, token, post_id };
+			const output = await this.commentBusiness.getComments(input);
 
-      await this.commentBusiness.createComment(input);
+			res.status(200).send(output);
+		} catch (error) {
+			console.log(error);
 
-      res.status(201).send({ message: 'Comentário criado com sucesso' });
-    } catch (error) {
-      console.log(error);
+			if (error instanceof ZodError) {
+				res.status(400).send(error.issues[0].message);
+			} else if (error instanceof BaseError) {
+				res.status(error.statusCode).send(error.message);
+			} else {
+				res.status(500).send('Erro inesperado');
+			}
+		}
+	};
 
-      if (error instanceof ZodError) {
-        res.status(400).send(error.issues);
-      } else if (error instanceof BaseError) {
-        res.status(error.statusCode).send(error.message);
-      } else {
-        res.status(500).send("Erro inesperado");
-      }
-    }
-  };
+	public createComment = async (req: Request, res: Response) => {
+		try {
+			const input = createCommentSchema.parse({
+				postId: req.params.id,
+				content: req.body.content,
+				token: req.headers.authorization,
+			});
 
-  public getCommentsByPost = async (req: Request, res: Response) => {
-    try {
-      const { post_id } = req.params;
+			await this.commentBusiness.createComment(input);
 
-      const comments = await this.commentBusiness.getCommentsByPost(post_id);
+			res.status(201).send();
+		} catch (error) {
+			console.log(error);
 
-      res.status(200).send(comments);
-    } catch (error) {
-      console.log(error);
+			if (error instanceof ZodError) {
+				res.status(400).send(error.issues[0].message);
+			} else if (error instanceof BaseError) {
+				res.status(error.statusCode).send(error.message);
+			} else {
+				res.status(500).send('Erro inesperado');
+			}
+		}
+	};
 
-      if (error instanceof BaseError) {
-        res.status(error.statusCode).send(error.message);
-      } else {
-        res.status(500).send("Erro inesperado");
-      }
-    }
-  };
+	public editComment = async (req: Request, res: Response): Promise<void> => {
+		try {
+			const input = editCommentSchema.parse({
+				id: req.params.id,
+				token: req.headers.authorization,
+				content: req.body.content,
+			});
 
+			await this.commentBusiness.editComment(input);
 
-public deleteComment = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const token = req.headers.authorization as string; 
+			res.status(200).send();
+		} catch (error) {
+			console.log(error);
 
-    await this.commentBusiness.deleteComment(id, token); 
+			if (error instanceof ZodError) {
+				res.status(400).send(error.issues[0].message);
+			} else if (error instanceof BaseError) {
+				res.status(error.statusCode).send(error.message);
+			} else {
+				res.status(500).send('Erro inesperado');
+			}
+		}
+	};
 
-    res.status(201).send({ message: 'Comentário deletado com sucesso' });
-  } catch (error) {
-    console.log(error);
+	public deleteComment = async (req: Request, res: Response): Promise<void> => {
+		try {
+			const input = deleteCommentSchema.parse({
+				id: req.params.id,
+				token: req.headers.authorization,
+			});
 
-    if (error instanceof BaseError) {
-      res.status(error.statusCode).send(error.message);
-    } else {
-      res.status(500).send("Erro inesperado");
-    }
-  }
-};
+			await this.commentBusiness.deleteComment(input);
 
+			res.status(200).send();
+		} catch (error) {
+			console.log(error);
 
-public likeOrDislikeComment = async (req: Request, res: Response) => {
-  try {
-    const input = LikeOrDislikeCommentSchema.parse({
-      token: req.headers.authorization,
-      commentId: req.params.id,
-      like: req.body.like
-    })
+			if (error instanceof ZodError) {
+				res.status(400).send(error.issues[0].message);
+			} else if (error instanceof BaseError) {
+				res.status(error.statusCode).send(error.message);
+			} else {
+				res.status(500).send('Erro inesperado');
+			}
+		}
+	};
 
-    const output = await this.commentBusiness.likeOrDislikeComment(input)
+	public likeComment = async (req: Request, res: Response): Promise<void> => {
+		try {
+			const input = likeCommentChema.parse({
+				id: req.params.id,
+				token: req.headers.authorization,
+				like: req.body.like,
+			});
 
-    res.status(200).send({ message: 'Comentário curtido/descurtido com sucesso' });
-    
-  } catch (error) {
-    console.log(error)
+			await this.commentBusiness.likeComment(input);
 
-    if (error instanceof ZodError) {
-      res.status(400).send(error.issues)
-    } else if (error instanceof BaseError) {
-      res.status(error.statusCode).send(error.message)
-    } else {
-      res.status(500).send("Erro inesperado")
-    }
-  }
-}
+			res.status(200).send();
+		} catch (error) {
+			console.log(error);
+
+			if (error instanceof ZodError) {
+				res.status(400).send(error.issues[0].message);
+			} else if (error instanceof BaseError) {
+				res.status(error.statusCode).send(error.message);
+			} else {
+				res.status(500).send('Erro inesperado');
+			}
+		}
+	};
+
+	public checkLike = async (req: Request, res: Response) => {
+		try {
+			const input = deleteCommentSchema.parse({
+				id: req.params.id,
+				token: req.headers.authorization,
+			});
+
+			const response = await this.commentBusiness.checkLike(input);
+
+			res.status(200).send(response);
+		} catch (error) {
+			console.log(error);
+
+			if (error instanceof ZodError) {
+				res.status(400).send(error.issues[0].message);
+			} else if (error instanceof BaseError) {
+				res.status(error.statusCode).send(error.message);
+			} else {
+				res.status(500).send('Erro inesperado');
+			}
+		}
+	};
 }

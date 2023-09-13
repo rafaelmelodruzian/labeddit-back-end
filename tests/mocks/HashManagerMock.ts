@@ -22,4 +22,3 @@ export class HashManagerMock {
     }
 }
 
-//Passou nos testes realizados

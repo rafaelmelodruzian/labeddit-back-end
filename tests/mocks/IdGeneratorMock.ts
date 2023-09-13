@@ -3,5 +3,3 @@ export class IdGeneratorMock {
         return "id-mock"
     }
 }
-
-//Passou nos testes realizados
